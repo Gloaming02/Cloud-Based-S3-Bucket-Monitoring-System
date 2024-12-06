@@ -6,7 +6,8 @@ import * as lambda from 'aws-cdk-lib/aws-lambda';
 import * as iam from 'aws-cdk-lib/aws-iam';
 
 export interface MyStackProps extends cdk.StackProps {
-  lambdaName: string;
+  loggingLambdaName: string;
+  cleanerLambdaArn: string;
 }
 
 export class CloudWatchMetricStack extends cdk.Stack {
@@ -14,7 +15,7 @@ export class CloudWatchMetricStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props: MyStackProps) {
     super(scope, id, props);
 
-    const logGroupName = '/aws/lambda/' + props.lambdaName;
+    const logGroupName = '/aws/lambda/' + props.loggingLambdaName;
 
     const logGroup = logs.LogGroup.fromLogGroupName(this, 'LoggingLambdaLogGroup', logGroupName);
 
@@ -38,6 +39,20 @@ export class CloudWatchMetricStack extends cdk.Stack {
       evaluationPeriods: 1, 
       comparisonOperator: cloudwatch.ComparisonOperator.GREATER_THAN_THRESHOLD,
       alarmDescription: 'Alarm when TotalObjectSize metric exceeds 20.',
+    });
+
+    const cleanerLambdaFunction = lambda.Function.fromFunctionArn(
+      this,
+      'CleanerLambdaFunction',
+      props.cleanerLambdaArn
+    );
+
+    cleanerLambdaFunction.grantInvoke(new iam.ServicePrincipal('cloudwatch.amazonaws.com'));
+
+    alarm.addAlarmAction({
+      bind: () => ({
+        alarmActionArn: props.cleanerLambdaArn,
+      }),
     });
 
   }
