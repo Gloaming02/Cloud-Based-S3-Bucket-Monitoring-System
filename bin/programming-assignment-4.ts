@@ -1,21 +1,69 @@
 #!/usr/bin/env node
 import 'source-map-support/register';
 import * as cdk from 'aws-cdk-lib';
-import { ProgrammingAssignment4Stack } from '../lib/programming-assignment-4-stack';
+import { S3FanoutStack } from '../lib/S3FanoutStack';
+import { DynamoDbCreateStack } from '../lib/DynamoDbCreateStack';
+import { SizeTrackingLambdaStack } from '../lib/SizeTrackingLambdaStack';
+import { PlottingLambdaStack } from '../lib/PlottingLambdaStack';
+import { DriverLambdaStack } from '../lib/DriverLambdaStack';
+import { LoggingLambdaStack } from '../lib/LoggingLambdaStack';
+import { CloudWatchMetricStack } from '../lib/CloudWatchMetricStack';
+import { CleanerLambdaStack } from '../lib/CleanerLambdaStack';
+
 
 const app = new cdk.App();
-new ProgrammingAssignment4Stack(app, 'ProgrammingAssignment4Stack', {
-  /* If you don't specify 'env', this stack will be environment-agnostic.
-   * Account/Region-dependent features and context lookups will not work,
-   * but a single synthesized template can be deployed anywhere. */
-
-  /* Uncomment the next line to specialize this stack for the AWS Account
-   * and Region that are implied by the current CLI configuration. */
-  // env: { account: process.env.CDK_DEFAULT_ACCOUNT, region: process.env.CDK_DEFAULT_REGION },
-
-  /* Uncomment the next line if you know exactly what Account and Region you
-   * want to deploy the stack to. */
-  // env: { account: '123456789012', region: 'us-east-1' },
-
-  /* For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html */
+const s3_stack = new S3FanoutStack(app, 'S3FanoutStack', {
+  env: { region: 'us-east-1' }
 });
+
+const bucketName = s3_stack.bucketName;
+const queueArn1 = s3_stack.queueArn1;
+const queueUrl1 = s3_stack.queueUrl1;
+const queueArn2 = s3_stack.queueArn2;
+const queueUrl2 = s3_stack.queueUrl2;
+
+const dynamodb_stack = new DynamoDbCreateStack(app, 'DynamoDbCreateStack', {
+  env: { region: 'us-east-1' }
+});
+
+const tableName = dynamodb_stack.tableName;
+
+new SizeTrackingLambdaStack(app, 'SizeTrackingLambdaStack', {
+  env: { region: 'us-east-1' },  
+  bucketName: bucketName,  
+  tableName: tableName,
+  queueArn: queueArn1,
+  queueUrl: queueUrl1
+});
+
+const api_url = new PlottingLambdaStack(app, 'PlottingLambdaStack', {
+  env: { region: 'us-east-1' },  
+  bucketName: bucketName,  
+  tableName: tableName
+});
+
+new DriverLambdaStack(app, 'DriverLambdaStack', {
+  env: { region: 'us-east-1' },  
+  bucketName: bucketName,  
+  apiUrl: api_url.PLOT_URL
+});
+
+
+const logging_stack = new LoggingLambdaStack(app, 'LoggingLambdaStack',{
+  env: { region: 'us-east-1' },  
+  queueArn: queueArn2,
+  queueUrl: queueUrl2
+})
+
+const cleaner_stack = new CleanerLambdaStack(app, 'CloudWatchMetricStack',{
+  env: { region: 'us-east-1' },  
+  bucketName: bucketName
+})
+const cleaner_lambda_arn = cleaner_stack.cleanerLambdaArn;
+const logging_lambda_Name = logging_stack.lambdaName;
+
+new CloudWatchMetricStack(app, 'CloudWatchMetricStack',{
+  env: { region: 'us-east-1' },  
+  loggingLambdaName: logging_lambda_Name,
+  cleanerLambdaArn: cleaner_lambda_arn
+})
