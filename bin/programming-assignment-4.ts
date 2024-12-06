@@ -55,7 +55,7 @@ const logging_stack = new LoggingLambdaStack(app, 'LoggingLambdaStack',{
   queueUrl: queueUrl2
 })
 
-const cleaner_stack = new CleanerLambdaStack(app, 'CloudWatchMetricStack',{
+const cleaner_stack = new CleanerLambdaStack(app, 'CleanerLambdaStack',{
   env: { region: 'us-east-1' },  
   bucketName: bucketName
 })

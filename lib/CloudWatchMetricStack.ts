@@ -47,7 +47,7 @@ export class CloudWatchMetricStack extends cdk.Stack {
       props.cleanerLambdaArn
     );
 
-    cleanerLambdaFunction.grantInvoke(new iam.ServicePrincipal('cloudwatch.amazonaws.com'));
+    // cleanerLambdaFunction.grantInvoke(new iam.ServicePrincipal('cloudwatch.amazonaws.com'));
 
     alarm.addAlarmAction({
       bind: () => ({
