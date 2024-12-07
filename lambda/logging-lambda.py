@@ -1,5 +1,9 @@
 import boto3
 import os
+
+lambda_function_name = os.getenv('AWS_LAMBDA_FUNCTION_NAME')
+log_group_name ="/aws/lambda/" + lambda_function_name
+
 import json
 
 logs_client = boto3.client('logs')
@@ -16,10 +20,10 @@ def get_object_size_from_logs(object_name, log_group_name):
                 return message['size_delta']
     except Exception as e:
         print(f"Error querying logs for object {object_name}: {str(e)}")
+        print(f"Log group '{log_group_name}' does not exist.")
     return None 
 
 def lambda_handler(event, context):
-    log_group_name = os.environ.get('LOG_GROUP_NAME', '/aws/lambda/LoggingLambda') 
 
     for record in event['Records']:
         sns_message = json.loads(record['body'])
