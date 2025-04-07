@@ -1,5 +1,6 @@
 # Welcome to your CDK TypeScript project
-##System design
+
+## System design
 ![image](https://github.com/user-attachments/assets/6401e3c1-d9f8-4ff8-9c74-6577883d2e28)
 
 This is a blank project for CDK development with TypeScript.
