@@ -8,11 +8,6 @@
 This project extends the functionality of a previous S3-based object monitoring system by introducing a **fanout pattern** with **SNS**, **SQS**, **multiple Lambda functions**, and **CloudWatch metrics/alarms** to automate bucket size management.
 
 ## 🛠 Project Description
-
-**Duration:** 09/2024 – 12/2024  
-**Course:** CS 6650 – Scalable Distributed Systems  
-**University:** Northeastern University
-
 This system automatically monitors object creation and deletion in an S3 bucket (`TestBucket`) and triggers a cleaner Lambda to remove the largest object when the total size exceeds a predefined threshold.
 
 ## ✨ Features
