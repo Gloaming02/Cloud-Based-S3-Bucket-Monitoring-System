@@ -1,4 +1,4 @@
-# Welcome to your CDK TypeScript project
+# Cloud-Based S3 Bucket Monitoring System
 
 ## System design
 ![image](https://github.com/user-attachments/assets/6401e3c1-d9f8-4ff8-9c74-6577883d2e28)
