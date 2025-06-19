@@ -7,8 +7,6 @@
 
 This project extends the functionality of a previous S3-based object monitoring system by introducing a **fanout pattern** with **SNS**, **SQS**, **multiple Lambda functions**, and **CloudWatch metrics/alarms** to automate bucket size management.
 
-![Architecture](./636ef971-c126-4b97-bdec-9b9d1780b541.png)
-
 ## 🛠 Project Description
 
 **Duration:** 09/2024 – 12/2024  
